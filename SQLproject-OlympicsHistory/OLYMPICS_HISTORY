@@ -1,5 +1,5 @@
-/*DROP TABLE IF EXISTS OLYMPIC_HISTORY;
-CREATE TABLE IF NOT EXISTS OLYMPIC_HISTORY
+/*DROP TABLE IF EXISTS OLYMPICS_HISTORY;
+CREATE TABLE IF NOT EXISTS OLYMPICS_HISTORY
 (
 	id INT,
 	name VARCHAR,
@@ -28,55 +28,54 @@ CREATE TABLE IF NOT EXISTS NOC_REGIONS
 
 -------------------------------------------------------------------------
 
-/*UPDATE OLYMPIC_HISTORY
+UPDATE OLYMPICS_HISTORY
 SET MEDAL = NULL
-WHERE MEDAL = 'NA';*/
+WHERE MEDAL = 'NA';
 
---SELECT * FROM OLYMPIC_HISTORY;
+--SELECT * FROM OLYMPICS_HISTORY;
 
 --QUERY 1: How many olympics games have been held?--
 
-
-SELECT COUNT(DISTINCT GAMES) FROM OLYMPIC_HISTORY;
+SELECT COUNT(DISTINCT GAMES) FROM OLYMPICS_HISTORY;
 
 --QUERY 2: List down all Olympics games held so far.--
 
-SELECT YEAR, SEASON, CITY FROM OLYMPIC_HISTORY
+SELECT YEAR, SEASON, CITY FROM OLYMPICS_HISTORY
 ORDER BY YEAR ASC;
 
 --QUERY 3: How many athlete total?
 
-SELECT COUNT(DISTINCT NAME) FROM OLYMPIC_HISTORY;
+SELECT COUNT(DISTINCT NAME) FROM OLYMPICS_HISTORY;
 
 --QUERY 4: HOW MANY OF THEM WON MEDAL?
 
-SELECT COUNT(DISTINCT NAME) FROM OLYMPIC_HISTORY WHERE MEDAL IS NOT NULL;
+SELECT COUNT(DISTINCT NAME) FROM OLYMPICS_HISTORY WHERE MEDAL IS NOT NULL;
 
 --QUERY 5: find the top 3 countries in terms of the total number of medals
 
-SELECT TEAM, COUNT(MEDAL) AS MEDAL_WON FROM OLYMPIC_HISTORY WHERE MEDAL IS NOT NULL
+SELECT TEAM, COUNT(MEDAL) AS MEDAL_WON FROM OLYMPICS_HISTORY WHERE MEDAL IS NOT NULL
 GROUP BY TEAM
 ORDER BY MEDAL_WON DESC
 LIMIT 3;
 
 --QUERY 6: average age of female and male athletes who won a medal.
 --SOME DATA IN AGE COLUMN IS 'NA' THEREFORE HAD TO USE SUBQUERY
-SELECT SEX, CEIL(AVG(AGE::INT)) AS AVERAGE_AGE FROM (SELECT SEX,age, MEDAL FROM OLYMPIC_HISTORY
+SELECT SEX, CEIL(AVG(AGE::INT)) AS AVERAGE_AGE FROM (SELECT SEX,age, MEDAL FROM OLYMPICS_HISTORY
 where age != 'NA') AS X
 GROUP BY SEX;
 
 --QUERY 7:  Identify the sport which was played in all summer olympics.
 
---SELECT SPORT, GAMES FROM OLYMPIC_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES
+--SELECT SPORT, GAMES FROM OLYMPICS_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES
 --STEP 1: FIND TOTAL NUMBER OF SUMMER OLYMPICS GAMES
---SELECT COUNT(DISTINCT GAMES) FROM OLYMPIC_HISTORY WHERE SEASON = 'Summer';
+--SELECT COUNT(DISTINCT GAMES) FROM OLYMPICS_HISTORY WHERE SEASON = 'Summer';
 --STEP 2: FIND FOR EACH SPORT, HOW MANY GAMES WERE THEY PLAYED IN SUMMER?
---SELECT DISTINCT SPORT, GAMES FROM OLYMPIC_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES
+--SELECT DISTINCT SPORT, GAMES FROM OLYMPICS_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES
 
 WITH T1 AS 
-	(SELECT COUNT(DISTINCT GAMES) AS TOTAL_SUMMER_GAMES FROM OLYMPIC_HISTORY WHERE SEASON = 'Summer'),
+	(SELECT COUNT(DISTINCT GAMES) AS TOTAL_SUMMER_GAMES FROM OLYMPICS_HISTORY WHERE SEASON = 'Summer'),
 	T2 AS
-	(SELECT DISTINCT SPORT, GAMES FROM OLYMPIC_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES),
+	(SELECT DISTINCT SPORT, GAMES FROM OLYMPICS_HISTORY WHERE SEASON = 'Summer' ORDER BY GAMES),
 	T3 AS
 	(SELECT SPORT, COUNT(GAMES) AS NO_OF_GAMES FROM T2 GROUP BY SPORT)
 SELECT * FROM T3 JOIN T1 ON T1.TOTAL_SUMMER_GAMES = T3.NO_OF_GAMES;
@@ -84,7 +83,7 @@ SELECT * FROM T3 JOIN T1 ON T1.TOTAL_SUMMER_GAMES = T3.NO_OF_GAMES;
 --QUERY 8: Fetch the top 5 athletes who have won the most gold medals.
 WITH T1 AS 
 		(SELECT NAME, count(*) AS TOTAL_MEDAL
-		FROM OLYMPIC_HISTORY WHERE MEDAL = 'Gold'
+		FROM OLYMPICS_HISTORY WHERE MEDAL = 'Gold'
 		GROUP BY NAME
 		ORDER BY COUNT(*) DESC),
 	T2 AS
@@ -93,27 +92,18 @@ SELECT * FROM T2 WHERE rank <=5;
 
 --QUERY 9: Fetch the top 5 athletes who have won the most medals (gold/silver/bronze).
 SELECT NAME, count(*) AS TOTAL_MEDAL
-FROM OLYMPIC_HISTORY 
+FROM OLYMPICS_HISTORY 
 GROUP BY NAME 
 ORDER BY COUNT(*) DESC LIMIT 5;
 
 --QUERY 10:Fetch the top 5 most successful countries in olympics. Success is defined by no of medals won
 
 SELECT TEAM, count(*) AS TOTAL_MEDAL
-FROM OLYMPIC_HISTORY 
+FROM OLYMPICS_HISTORY 
 GROUP BY TEAM 
 ORDER BY COUNT(*) DESC LIMIT 5;
 
---Query 11: Fetch the top 5 athletes who have won the most gold medals.
---Query 12: Fetch the top 5 athletes who have won the most medals (gold/silver/bronze).
---Query 13: Fetch the top 5 most successful countries in olympics. Success is defined by no of medals won.
---Query 14: List down total gold, silver and broze medals won by each country.
---Query 15: List down total gold, silver and broze medals won by each country corresponding to each olympic games.
---Query 16: Identify which country won the most gold, most silver and most bronze medals in each olympic games.
---Query 17: Identify which country won the most gold, most silver, most bronze medals and the most medals in each olympic games.
---Query 18: Which countries have never won gold medal but have won silver/bronze medals?
---Query 19: In which Sport/event, India has won highest medals.
---Query 20: Break down all olympic games where india won medal for Hockey and how many medals in each olympic games.
+
 
 
 	
