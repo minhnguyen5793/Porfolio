@@ -1,0 +1,75 @@
+/*DROP TABLE IF EXISTS HR_TABLE;
+CREATE TABLE IF NOT EXISTS HR_TABLE
+(
+	name VARCHAR,
+	id INT,
+	performance_score INT,
+	salary INT,
+	position_id INT,
+	position VARCHAR,
+	state CHAR(2),
+	zipcode VARCHAR,
+	birthdate DATE,
+	sex CHAR(1),
+	marital_status VARCHAR,
+	race VARCHAR,
+	date_hire DATE,
+	employment_status VARCHAR,
+	department VARCHAR,
+	manager_id INT,
+	recruiment_source VARCHAR,
+	emp_satisfaction INT,
+	day_late INT,
+	day_absent INT
+);*/
+
+--select * from HR_TABLE;
+
+--Q1: Find the employees whoes salary is more than average salary by all employees 
+
+Select name, salary from HR_TABLE 
+where salary > (select avg(salary) from HR_TABLE)
+order by salary desc;
+
+--Q1b: Find the employees whoes salary is more than average salary by all employees 
+--Using CTE
+
+with avg_salary (avg_sal) as (select avg(salary) from HR_TABLE)
+select name, department, salary
+from HR_TABLE, avg_salary
+where HR_TABLE.salary > avg_salary.avg_sal;
+
+--Q2: Find the employees who earns the highest salary in each department
+
+select name, department, salary from HR_TABLE 
+where (department, salary) in
+							(select department, MAX(salary) from HR_TABLE 
+							group by department)
+order by salary desc;
+
+--Q3: Find employees in each department who earn more than the average salary 
+--in that department
+
+select name, department, salary from HR_TABLE hr1
+where salary > (select avg(salary) from HR_TABLE hr2
+			   where hr1.department = hr2.department
+				);
+
+--Q4:  Write a SQL query to display  
+-- highest salary and lowest salary of each department on each record
+
+select hr.name, hr.salary, hr.department,
+max(salary) over (partition by department) as max_salary,
+min(salary) over (partition by department) as min_salary
+from HR_TABLE hr;
+
+--Q5 Fetch 3 employees in each department who earn the top 3 salary
+
+select name, salary, department, rank
+from (
+		select hr.*,
+		rank() over (partition by department order by salary desc) as rank
+		from HR_TABLE hr
+	)x
+where x.rank < 4;
+
